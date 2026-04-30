@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="28-Day SEO, Backlink, GBP and Local Marketing Tracker for The Royals Removals, Birmingham.">
+  <title>The Royals Removals SEO Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Sticky Progress -->
+  <div class="sticky-progress">
+    <span id="stickyPct">0% Complete</span>
+    <div class="bar-track"><div class="bar-fill" id="stickyFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <h1>👑 The Royals Removals SEO Tracker</h1>
+    <p class="subtitle">28-Day SEO, Backlink, GBP and Local Marketing Plan</p>
+    <div class="header-info">
+      <a href="https://www.theroyalsremovals.co.uk/" target="_blank">theroyalsremovals.co.uk</a>
+      <span style="color:rgba(255,255,255,.4)">|</span>
+      <span>📞 07345 624506</span>
+    </div>
+    <div class="header-info" style="margin-top:.75rem">
+      <button class="btn btn-accent btn-sm" onclick="copyText('https://www.theroyalsremovals.co.uk/')">📋 Copy Website URL</button>
+      <button class="btn btn-accent btn-sm" onclick="copyText('07345 624506')">📋 Copy Phone</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <button class="btn btn-outline btn-sm" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+      <button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Print</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard-grid">
+      <div class="dash-card"><div class="value" id="totalTasks">0</div><div class="label">Total Tasks</div></div>
+      <div class="dash-card"><div class="value" id="completedTasks" style="color:var(--success)">0</div><div class="label">Completed</div></div>
+      <div class="dash-card"><div class="value" id="remainingTasks" style="color:var(--warning)">0</div><div class="label">Remaining</div></div>
+      <div class="dash-card"><div class="value" id="overallPct">0%</div><div class="label">Progress</div></div>
+      <div class="dash-card"><div class="value" id="currentWeek">Week 1</div><div class="label">Current Week</div></div>
+      <div class="dash-card"><div class="value" id="monthlyRemaining" style="color:var(--info)">0</div><div class="label">Monthly Remaining</div></div>
+    </div>
+
+    <!-- Progress Bars -->
+    <div class="progress-section">
+      <div class="progress-item"><div class="label"><span>Overall 28-Day Progress</span><span id="overallPctLabel">0%</span></div><div class="progress-track"><div class="progress-fill" id="overallFill" style="width:0%"></div></div></div>
+      <div class="progress-item"><div class="label"><span>Week 1 — Citations</span><span id="w1Pct">0%</span></div><div class="progress-track"><div class="progress-fill" id="w1Fill" style="width:0%"></div></div></div>
+      <div class="progress-item"><div class="label"><span>Week 2 — Social Profiles</span><span id="w2Pct">0%</span></div><div class="progress-track"><div class="progress-fill" id="w2Fill" style="width:0%"></div></div></div>
+      <div class="progress-item"><div class="label"><span>Week 3 — Local Partners</span><span id="w3Pct">0%</span></div><div class="progress-track"><div class="progress-fill" id="w3Fill" style="width:0%"></div></div></div>
+      <div class="progress-item"><div class="label"><span>Week 4 — Blog, Content &amp; SEO</span><span id="w4Pct">0%</span></div><div class="progress-track"><div class="progress-fill" id="w4Fill" style="width:0%"></div></div></div>
+      <div class="progress-item"><div class="label"><span>Monthly Plan</span><span id="monthlyPctLabel">0%</span></div><div class="progress-track"><div class="progress-fill" id="monthlyFill" style="width:0%"></div></div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <input type="text" id="searchInput" placeholder="🔍 Search tasks..." oninput="renderTasks()">
+      <select id="weekFilter" onchange="renderTasks()">
+        <option value="All">All Weeks</option>
+        <option>Week 1</option><option>Week 2</option><option>Week 3</option><option>Week 4</option><option>Monthly</option>
+      </select>
+      <select id="catFilter" onchange="renderTasks()">
+        <option value="All">All Categories</option>
+        <option>Citations</option><option>Social Profiles</option><option>Partners</option><option>Blog</option><option>GBP</option><option>Search Console</option><option>Reviews</option>
+      </select>
+      <select id="statusFilter" onchange="renderTasks()">
+        <option value="All">All Status</option>
+        <option>Not Started</option><option>In Progress</option><option>Completed</option>
+      </select>
+      <select id="prioFilter" onchange="renderTasks()">
+        <option value="All">All Priority</option>
+        <option>High</option><option>Medium</option><option>Low</option>
+      </select>
+    </div>
+
+    <!-- Task List -->
+    <div class="section">
+      <div class="section-header" id="tasks-header" onclick="toggleSection('tasks')">
+        <h2>📋 28-Day Task List</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="tasks-body">
+        <div id="taskList"></div>
+      </div>
+    </div>
+
+    <!-- Citation Directories -->
+    <div class="section">
+      <div class="section-header" id="dirs-header" onclick="toggleSection('dirs')">
+        <h2>📂 Citation Directories</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="dirs-body">
+        <div class="dir-grid" id="dirGrid"></div>
+      </div>
+    </div>
+
+    <!-- Copy Business Details -->
+    <div class="section">
+      <div class="section-header" id="biz-header" onclick="toggleSection('biz')">
+        <h2>🏢 Copy Business Details</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="biz-body">
+        <div class="copy-grid">
+          <div class="copy-item"><div><div class="copy-label">Business Name</div><div class="copy-value">The Royals Removals</div></div><button class="btn btn-copy btn-sm" onclick="copyText('The Royals Removals')">📋</button></div>
+          <div class="copy-item"><div><div class="copy-label">Website</div><div class="copy-value">theroyalsremovals.co.uk</div></div><button class="btn btn-copy btn-sm" onclick="copyText('https://www.theroyalsremovals.co.uk/')">📋</button></div>
+          <div class="copy-item"><div><div class="copy-label">Phone</div><div class="copy-value">07345 624506</div></div><button class="btn btn-copy btn-sm" onclick="copyText('07345 624506')">📋</button></div>
+          <div class="copy-item"><div><div class="copy-label">Category</div><div class="copy-value">Removals company / Moving company</div></div><button class="btn btn-copy btn-sm" onclick="copyText('Removals company / Moving company')">📋</button></div>
+          <div class="copy-item"><div><div class="copy-label">Location</div><div class="copy-value">Birmingham, West Midlands</div></div><button class="btn btn-copy btn-sm" onclick="copyText('Birmingham, West Midlands')">📋</button></div>
+          <div class="copy-item"><div><div class="copy-label">Services</div><div class="copy-value" style="font-size:.78rem">House Removals, Furniture Removals, Office Relocation, Commercial Removals, Packing Services, Man and Van, Equipment Removals, Student Removals</div></div><button class="btn btn-copy btn-sm" onclick="copyText('House Removals, Furniture Removals, Office Relocation, Commercial Removals, Packing Services, Man and Van, Equipment Removals, Student Removals')">📋</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Business Description -->
+    <div class="section">
+      <div class="section-header" id="desc-header" onclick="toggleSection('desc')">
+        <h2>📝 Business Description</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="desc-body">
+        <div class="email-block">The Royals Removals is a trusted removals company serving Birmingham and the West Midlands. We provide house removals, furniture removals, office relocation, commercial removals, packing services, man and van, equipment removals and student removals. Our team offers careful handling, secure transport and reliable service from start to finish.</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="copyText('The Royals Removals is a trusted removals company serving Birmingham and the West Midlands. We provide house removals, furniture removals, office relocation, commercial removals, packing services, man and van, equipment removals and student removals. Our team offers careful handling, secure transport and reliable service from start to finish.')">📋 Copy Description</button>
+      </div>
+    </div>
+
+    <!-- GBP Services -->
+    <div class="section">
+      <div class="section-header" id="gbpServices-header" onclick="toggleSection('gbpServices')">
+        <h2>🔧 GBP Services</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="gbpServices-body">
+        <div id="gbpServicesList"></div>
+      </div>
+    </div>
+
+    <!-- Partner Outreach -->
+    <div class="section">
+      <div class="section-header" id="partners-header" onclick="toggleSection('partners')">
+        <h2>🤝 Local Partner Backlinks</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="partners-body">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem">
+          <select id="partnerTypeFilter" onchange="renderPartners()">
+            <option value="All">All Partner Types</option>
+            <option>Estate Agents</option><option>Letting Agents</option><option>Storage Companies</option>
+            <option>Cleaning Companies</option><option>Furniture Shops</option><option>Student Accommodation</option>
+            <option>Office Fit-Out Companies</option><option>Property Managers</option><option>Builders</option>
+            <option>Interior Designers</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="addPartner()">+ Add Partner</button>
+        </div>
+        <div class="partner-table-wrap">
+          <table class="partner-table">
+            <thead><tr><th>Name</th><th>Website</th><th>Email</th><th>Phone</th><th>Type</th><th>Contacted</th><th>Replied</th><th>Backlink</th><th>Notes</th><th></th></tr></thead>
+            <tbody id="partnerBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email Template -->
+    <div class="section">
+      <div class="section-header" id="email-header" onclick="toggleSection('email')">
+        <h2>✉️ Email Template</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="email-body">
+        <div class="email-block">Subject: Local removals partnership
+
+Hi,
+
+I run The Royals Removals, a Birmingham and West Midlands removals company.
+
+We help with house removals, flat moves, furniture removals, office relocation, packing services and man and van jobs.
+
+I wanted to ask if you ever need a reliable removals partner for your customers. We would also be happy to recommend your business where relevant.
+
+Website: https://www.theroyalsremovals.co.uk/
+
+Kind regards,
+The Royals Removals</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="copyText(EMAIL_TEMPLATE)">📋 Copy Email Template</button>
+      </div>
+    </div>
+
+    <!-- Blog Tracker -->
+    <div class="section">
+      <div class="section-header" id="blogs-header" onclick="toggleSection('blogs')">
+        <h2>📰 Blog Tracker</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="blogs-body">
+        <div id="blogList"></div>
+      </div>
+    </div>
+
+    <!-- Search Console -->
+    <div class="section">
+      <div class="section-header" id="searchConsole-header" onclick="toggleSection('searchConsole')">
+        <h2>🔍 Search Console Checklist</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="searchConsole-body">
+        <div id="scList"></div>
+      </div>
+    </div>
+
+    <!-- GBP Checklist -->
+    <div class="section">
+      <div class="section-header" id="gbpChecklist-header" onclick="toggleSection('gbpChecklist')">
+        <h2>📍 Google Business Profile Checklist</h2><span class="chevron">▼</span>
+      </div>
+      <div class="section-body" id="gbpChecklist-body">
+        <div id="gbpList"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="bottom-actions">
+      <button class="btn btn-primary" onclick="copyAllBusinessDetails()">📋 Copy All Business Details</button>
+      <button class="btn btn-primary" onclick="copyAllGBPServices()">📋 Copy All GBP Services</button>
+      <button class="btn btn-primary" onclick="copyText(EMAIL_TEMPLATE)">📋 Copy Email Template</button>
+      <button class="btn btn-primary" onclick="copyFullPlan()">📋 Copy Full 28-Day Plan</button>
+      <button class="btn btn-success" onclick="exportProgress()">⬇️ Export Progress</button>
+      <button class="btn btn-accent" onclick="importProgress()">⬆️ Import Progress</button>
+      <button class="btn btn-danger" onclick="resetProgress()">🗑️ Reset Progress</button>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
