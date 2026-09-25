@@ -3,38 +3,54 @@ let state = loadState();
 
 function loadState() {
   try {
-    const s = JSON.parse(localStorage.getItem('royals_seo_state'));
+    const s = JSON.parse(localStorage.getItem('jimmys_seo_state') || localStorage.getItem('royals_seo_state'));
     if (s) return s;
   } catch(e) {}
   return { tasks: {}, monthly: {}, dirs: {}, blogs: {}, sc: {}, gbp: {}, partners: [], theme: 'light' };
 }
 
-function saveState() { localStorage.setItem('royals_seo_state', JSON.stringify(state)); }
+function saveState() {
+  localStorage.setItem('jimmys_seo_state', JSON.stringify(state));
+}
 
 function toast(msg) {
   const t = document.createElement('div');
   t.className = 'toast';
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 2000);
+  setTimeout(() => t.remove(), 2200);
 }
 
 function copyText(text) {
-  navigator.clipboard.writeText(text).then(() => toast('Copied!')).catch(() => toast('Copy failed'));
+  navigator.clipboard.writeText(text).then(() => toast('Copied!')).catch(() => {
+    // Fallback for non-https or older environments
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      toast('Copied!');
+    } catch(err) {
+      toast('Copy failed');
+    }
+    document.body.removeChild(textarea);
+  });
 }
 
 function toggleTheme() {
   state.theme = state.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', state.theme);
-  document.getElementById('themeBtn').textContent = state.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) themeBtn.textContent = state.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
   saveState();
 }
 
 function toggleSection(id) {
   const body = document.getElementById(id + '-body');
   const header = document.getElementById(id + '-header');
-  body.classList.toggle('hidden');
-  header.classList.toggle('collapsed');
+  if (body) body.classList.toggle('hidden');
+  if (header) header.classList.toggle('collapsed');
 }
 
 function getTaskKey(t, i) { return 'd' + t.day + '_' + i; }
@@ -50,24 +66,33 @@ function updateDashboard() {
   const allDone = done + mDone;
   const pct = allTotal ? Math.round((allDone / allTotal) * 100) : 0;
 
-  document.getElementById('totalTasks').textContent = allTotal;
-  document.getElementById('completedTasks').textContent = allDone;
-  document.getElementById('remainingTasks').textContent = allTotal - allDone;
-  document.getElementById('overallPct').textContent = pct + '%';
+  const totalTasksEl = document.getElementById('totalTasks');
+  const completedTasksEl = document.getElementById('completedTasks');
+  const remainingTasksEl = document.getElementById('remainingTasks');
+  const overallPctEl = document.getElementById('overallPct');
+  const currentWeekEl = document.getElementById('currentWeek');
+  const monthlyRemainingEl = document.getElementById('monthlyRemaining');
+
+  if (totalTasksEl) totalTasksEl.textContent = allTotal;
+  if (completedTasksEl) completedTasksEl.textContent = allDone;
+  if (remainingTasksEl) remainingTasksEl.textContent = allTotal - allDone;
+  if (overallPctEl) overallPctEl.textContent = pct + '%';
 
   const today = new Date();
-  const startStr = localStorage.getItem('royals_start');
+  const startStr = localStorage.getItem('jimmys_start') || localStorage.getItem('royals_start');
   let currentWeek = 1;
   if (startStr) {
     const diff = Math.floor((today - new Date(startStr)) / 86400000);
     currentWeek = Math.min(4, Math.max(1, Math.ceil((diff + 1) / 7)));
   }
-  document.getElementById('currentWeek').textContent = 'Week ' + currentWeek;
-  document.getElementById('monthlyRemaining').textContent = mTotal - mDone;
+  if (currentWeekEl) currentWeekEl.textContent = 'Week ' + currentWeek;
+  if (monthlyRemainingEl) monthlyRemainingEl.textContent = mTotal - mDone;
 
   // Progress bars
-  document.getElementById('overallFill').style.width = pct + '%';
-  document.getElementById('overallPctLabel').textContent = pct + '%';
+  const overallFillEl = document.getElementById('overallFill');
+  const overallPctLabelEl = document.getElementById('overallPctLabel');
+  if (overallFillEl) overallFillEl.style.width = pct + '%';
+  if (overallPctLabelEl) overallPctLabelEl.textContent = pct + '%';
 
   for (let w = 1; w <= 4; w++) {
     const wTasks = TASKS.filter(t => t.week === w);
@@ -76,24 +101,38 @@ function updateDashboard() {
       return (state.tasks[getTaskKey(t, idx)] || {}).status === 'Completed';
     }).length;
     const wp = wTasks.length ? Math.round((wDone / wTasks.length) * 100) : 0;
-    document.getElementById('w' + w + 'Fill').style.width = wp + '%';
-    document.getElementById('w' + w + 'Pct').textContent = wp + '%';
+    const fillEl = document.getElementById('w' + w + 'Fill');
+    const pctEl = document.getElementById('w' + w + 'Pct');
+    if (fillEl) fillEl.style.width = wp + '%';
+    if (pctEl) pctEl.textContent = wp + '%';
   }
 
   const mp = mTotal ? Math.round((mDone / mTotal) * 100) : 0;
-  document.getElementById('monthlyFill').style.width = mp + '%';
-  document.getElementById('monthlyPctLabel').textContent = mp + '%';
-  document.getElementById('stickyFill').style.width = pct + '%';
-  document.getElementById('stickyPct').textContent = pct + '% Complete';
+  const monthlyFillEl = document.getElementById('monthlyFill');
+  const monthlyPctLabelEl = document.getElementById('monthlyPctLabel');
+  const stickyFillEl = document.getElementById('stickyFill');
+  const stickyPctEl = document.getElementById('stickyPct');
+
+  if (monthlyFillEl) monthlyFillEl.style.width = mp + '%';
+  if (monthlyPctLabelEl) monthlyPctLabelEl.textContent = mp + '%';
+  if (stickyFillEl) stickyFillEl.style.width = pct + '%';
+  if (stickyPctEl) stickyPctEl.textContent = pct + '% Complete';
 }
 
 function renderTasks() {
   const container = document.getElementById('taskList');
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const weekF = document.getElementById('weekFilter').value;
-  const catF = document.getElementById('catFilter').value;
-  const statusF = document.getElementById('statusFilter').value;
-  const prioF = document.getElementById('prioFilter').value;
+  if (!container) return;
+  const searchInput = document.getElementById('searchInput');
+  const weekFilter = document.getElementById('weekFilter');
+  const catFilter = document.getElementById('catFilter');
+  const statusFilter = document.getElementById('statusFilter');
+  const prioFilter = document.getElementById('prioFilter');
+
+  const search = searchInput ? searchInput.value.toLowerCase() : '';
+  const weekF = weekFilter ? weekFilter.value : 'All';
+  const catF = catFilter ? catFilter.value : 'All';
+  const statusF = statusFilter ? statusFilter.value : 'All';
+  const prioF = prioFilter ? prioFilter.value : 'All';
 
   let html = '';
   const allTasks = [
@@ -123,7 +162,7 @@ function renderTasks() {
       <div class="task-top">
         <input type="checkbox" ${isComplete ? 'checked' : ''} onchange="toggleTask('${t.store}','${t.key}',this.checked)">
         <span class="task-title">${t.title}</span>
-        <button class="btn btn-copy btn-sm" onclick="copyText('${t.title}: ${t.details.replace(/'/g, "\\'")}')">📋</button>
+        <button class="btn btn-copy btn-sm" onclick="copyText('${t.title.replace(/'/g, "\\'")}: ${t.details.replace(/'/g, "\\'")}')">📋</button>
       </div>
       <div class="task-meta">
         <span class="badge badge-week">Day ${t.day}</span>
@@ -132,7 +171,7 @@ function renderTasks() {
         <span class="badge badge-priority-${t.priority.toLowerCase()}">${t.priority}</span>
       </div>
       <div class="task-details">${t.details}</div>
-      ${t.link ? `<div class="task-link"><a href="${t.link}" target="_blank">🔗 ${t.link}</a></div>` : ''}
+      ${t.link ? `<div class="task-link"><a href="${t.link}" target="_blank" rel="noopener">🔗 ${t.link}</a></div>` : ''}
       <div class="task-controls">
         <select onchange="setTaskStatus('${t.store}','${t.key}',this.value)">
           <option${status === 'Not Started' ? ' selected' : ''}>Not Started</option>
@@ -176,12 +215,13 @@ function setTaskDate(store, key, val) {
 
 function renderDirectories() {
   const c = document.getElementById('dirGrid');
+  if (!c) return;
   c.innerHTML = DIRECTORIES.map((d, i) => {
     const s = state.dirs['dir' + i] || {};
     return `<div class="dir-card">
       <h3>${d.name}</h3>
       <div class="dir-btns">
-        <a href="${d.url}" target="_blank" class="btn btn-primary btn-sm">Open</a>
+        <a href="${d.url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Open</a>
         <button class="btn btn-copy btn-sm" onclick="copyText('${d.url}')">Copy URL</button>
       </div>
       <label><input type="checkbox" ${s.submitted ? 'checked' : ''} onchange="setDir(${i},'submitted',this.checked)"> Submitted</label>
@@ -206,36 +246,39 @@ function setDir(i, prop, val) {
 
 function renderGBPServices() {
   const c = document.getElementById('gbpServicesList');
+  if (!c) return;
   c.innerHTML = GBP_SERVICES.map((s, i) => `<div class="accordion-item">
     <div class="accordion-header" onclick="this.nextElementSibling.classList.toggle('open')">
       <span>${s.name}</span><span class="chevron">▼</span>
     </div>
     <div class="accordion-body">
       <p>${s.desc}</p>
-      <button class="btn btn-copy btn-sm" style="margin-top:8px" onclick="copyText('${s.name}: ${s.desc.replace(/'/g, "\\'")}')">📋 Copy</button>
+      <button class="btn btn-copy btn-sm" style="margin-top:8px" onclick="copyText('${s.name.replace(/'/g, "\\'")}: ${s.desc.replace(/'/g, "\\'")}')">📋 Copy</button>
     </div>
   </div>`).join('');
 }
 
 function renderPartners() {
   const partners = state.partners || [];
-  const typeFilter = document.getElementById('partnerTypeFilter').value;
+  const typeFilterEl = document.getElementById('partnerTypeFilter');
+  const typeFilter = typeFilterEl ? typeFilterEl.value : 'All';
   const filtered = typeFilter === 'All' ? partners : partners.filter(p => p.type === typeFilter);
   const tbody = document.getElementById('partnerBody');
+  if (!tbody) return;
   tbody.innerHTML = filtered.map((p, idx) => {
     const realIdx = partners.indexOf(p);
     return `<tr>
-      <td><input type="text" value="${(p.name || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'name',this.value)"></td>
-      <td><input type="text" value="${(p.website || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'website',this.value)"></td>
-      <td><input type="text" value="${(p.email || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'email',this.value)"></td>
-      <td><input type="text" value="${(p.phone || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'phone',this.value)"></td>
+      <td><input type="text" value="${(p.name || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'name',this.value)" placeholder="Partner business"></td>
+      <td><input type="text" value="${(p.website || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'website',this.value)" placeholder="Website"></td>
+      <td><input type="text" value="${(p.email || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'email',this.value)" placeholder="Email"></td>
+      <td><input type="text" value="${(p.phone || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'phone',this.value)" placeholder="Phone"></td>
       <td><select onchange="updatePartner(${realIdx},'type',this.value)">
         ${PARTNER_TYPES.map(t => `<option${p.type === t ? ' selected' : ''}>${t}</option>`).join('')}
       </select></td>
       <td><input type="checkbox" ${p.contacted ? 'checked' : ''} onchange="updatePartner(${realIdx},'contacted',this.checked)"></td>
       <td><input type="checkbox" ${p.replied ? 'checked' : ''} onchange="updatePartner(${realIdx},'replied',this.checked)"></td>
       <td><input type="checkbox" ${p.backlink ? 'checked' : ''} onchange="updatePartner(${realIdx},'backlink',this.checked)"></td>
-      <td><input type="text" value="${(p.notes || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'notes',this.value)"></td>
+      <td><input type="text" value="${(p.notes || '').replace(/"/g, '&quot;')}" onchange="updatePartner(${realIdx},'notes',this.value)" placeholder="Notes..."></td>
       <td><button class="btn btn-danger btn-sm" onclick="removePartner(${realIdx})">✕</button></td>
     </tr>`;
   }).join('');
@@ -259,10 +302,11 @@ function removePartner(i) {
 
 function renderBlogs() {
   const c = document.getElementById('blogList');
+  if (!c) return;
   c.innerHTML = BLOG_ITEMS.map((b, i) => {
     const s = state.blogs['blog' + i] || {};
     return `<div class="blog-item">
-      <h3>${b.title} <button class="btn btn-copy btn-sm" onclick="copyText('${b.title}')">📋</button></h3>
+      <h3>${b.title} <button class="btn btn-copy btn-sm" onclick="copyText('${b.title.replace(/'/g, "\\'")}')">📋</button></h3>
       <div class="blog-controls">
         <select onchange="setBlog(${i},'status',this.value)">
           ${['Idea','Writing','Published','Shared','Indexed'].map(st => `<option${(s.status || 'Idea') === st ? ' selected' : ''}>${st}</option>`).join('')}
@@ -285,6 +329,7 @@ function setBlog(i, prop, val) {
 
 function renderChecklist(items, stateKey, containerId) {
   const c = document.getElementById(containerId);
+  if (!c) return;
   c.innerHTML = items.map((item, i) => {
     const done = (state[stateKey] || {})[i];
     return `<div class="checklist-item${done ? ' done' : ''}">
@@ -306,7 +351,7 @@ function exportProgress() {
   const blob = new Blob([JSON.stringify(state, null, 2)], {type: 'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'royals-seo-progress.json';
+  a.download = 'jimmys-removals-seo-progress.json';
   a.click();
   toast('Progress exported!');
 }
@@ -333,7 +378,7 @@ function importProgress() {
 }
 
 function resetProgress() {
-  if (confirm('Are you sure you want to reset ALL progress? This cannot be undone.')) {
+  if (confirm('Are you sure you want to reset ALL progress for Jimmys Removals tracker? This cannot be undone.')) {
     state = { tasks: {}, monthly: {}, dirs: {}, blogs: {}, sc: {}, gbp: {}, partners: [], theme: state.theme };
     saveState();
     renderAll();
@@ -342,17 +387,36 @@ function resetProgress() {
 }
 
 function copyAllBusinessDetails() {
-  const text = `Business Name: ${BUSINESS.name}\nWebsite: ${BUSINESS.website}\nPhone: ${BUSINESS.phone}\nCategory: ${BUSINESS.category}\nLocation: ${BUSINESS.location}\nServices: ${BUSINESS.services}\n\nDescription:\n${BUSINESS.description}`;
+  const text = `Trading Name: ${BUSINESS.name}
+Registered Name: ${BUSINESS.registeredName}
+Company Number: ${BUSINESS.companyNumber} (${BUSINESS.companyType})
+Companies House: ${BUSINESS.companiesHouseUrl}
+Website: ${BUSINESS.website}
+Telephone: ${BUSINESS.phone}
+Email: ${BUSINESS.email}
+WhatsApp: ${BUSINESS.whatsapp}
+Address / Depot: ${BUSINESS.address}
+Google Maps: ${BUSINESS.mapsUrl}
+Operating Hours: ${BUSINESS.hours}
+Category: ${BUSINESS.category}
+Location: ${BUSINESS.location}
+Services: ${BUSINESS.services}
+
+Tagline / Help Desk:
+${BUSINESS.tagline}
+
+Description:
+${BUSINESS.description}`;
   copyText(text);
 }
 
 function copyAllGBPServices() {
-  const text = GBP_SERVICES.map(s => `${s.name}: ${s.desc}`).join('\n\n');
+  const text = GBP_SERVICES.map(s => `${s.name}:\n${s.desc}`).join('\n\n');
   copyText(text);
 }
 
 function copyFullPlan() {
-  let text = '28-DAY SEO PLAN - The Royals Removals\n\n';
+  let text = `28-DAY SEO PLAN - Jimmys Removals and Logistics (${BUSINESS.website})\n\n`;
   for (let w = 1; w <= 4; w++) {
     text += `=== WEEK ${w} ===\n`;
     const wt = TASKS.filter(t => t.week === w);
@@ -370,8 +434,11 @@ function copyFullPlan() {
 
 function renderAll() {
   document.documentElement.setAttribute('data-theme', state.theme || 'light');
-  document.getElementById('themeBtn').textContent = state.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
-  if (!localStorage.getItem('royals_start')) localStorage.setItem('royals_start', new Date().toISOString());
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) themeBtn.textContent = state.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+  if (!localStorage.getItem('jimmys_start') && !localStorage.getItem('royals_start')) {
+    localStorage.setItem('jimmys_start', new Date().toISOString());
+  }
   renderTasks();
   renderDirectories();
   renderGBPServices();
