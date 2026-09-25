@@ -158,7 +158,7 @@ const BUSINESS = {
   location: "Birmingham, West Midlands (B34 6AE)",
   services: "House Removals, Office Relocation, Commercial Removals, Furniture Removals, Packing Services, Man and Van, 24/7 Emergency Moves, Logistics & Deliveries, Student Removals",
   tagline: "We're Here to Help You Move. Have questions about van access, key release delays, or packing services? Contact our Birmingham operations desk directly.",
-  description: "Jimmys Removals and Logistics (trading as Jimmys Logistics and Removals Limited, Co. No. 16876169) is a trusted 24/7 removals and logistics provider headquartered at 66 Beaufort Avenue, Birmingham, B34 6AE. We provide reliable house removals, furniture moving, office relocation, commercial transport, full packing services, man and van, and urgent deliveries arranged day or night across Birmingham and the West Midlands.",
+  description: "Jimmys Removals and Logistics is a Birmingham-based removals and delivery company covering the whole West Midlands. We offer house removals, flat and apartment moves, office and commercial relocations, furniture removals, man and van hire, packing services, and same-day delivery. Available 24 hours a day, our team is ready for planned moves and last-minute jobs alike. Every item is carefully wrapped, securely loaded, and fully insured in transit. From a single sofa to a full office move, we keep you updated at every step and get your belongings where they need to be, on time",
 };
 
 const EMAIL_TEMPLATE = `Subject: Local removals and logistics partnership — Jimmys Removals
